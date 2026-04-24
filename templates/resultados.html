@@ -4,6 +4,19 @@
 
 {% block conteudo %}
 
+<div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for categoria, mensagem in messages %}
+                    <div class="alert alert-{{ categoria }} alert-dismissible fade show" role="alert">
+                        {{ mensagem }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+</div>
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>📋 Resultados de Cálculos</h2>
     <div>
@@ -25,16 +38,21 @@
             </tr>
         </thead>
         <tbody>
+            {% for calc in calculos %}
+            {% set imc = calcular(calc['peso'], calc['altura'])%}
             <tr>
-                <td>1</td>
-                <td>John Doe</td>
-                <td>70.5</td>
-                <td>1.75</td>
-                <td>22.86</td>
+                <td>{{ calc['id_calculo']}}</td>
+                <td>{{ calc['nome']}}</td>
+                <td>{{ calc['peso']}}</td>
+                <td>{{ calc['altura']}}</td>
+                <td>{{ imc }}</td>
                 <td>
-                    <span class="badge bg-success">Peso normal</span>
+                    <span class="badge bg-success">
+                        {{ classificacao(imc) }}
+                    </span>
                 </td>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
