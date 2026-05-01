@@ -11,24 +11,31 @@
                 <strong>➕ Novo Cálculo de IMC</strong>
             </div>
             <div class="card-body">
-                <form action="{{ url_for('calcular') }}" method="post">
+                {% if dados %}
+
+                <form action="{{ url_for('editar_imc', id=dados.id_calculo) }}" method="POST">
+
+                {% else %}
+                <form action="{{ url_for('calcular') }}" method="POST">
+
+                {% endif %}    
 
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome completo</label>
-                        <input type="text" class="form-control" id="nome" name="nome"
+                        <input type="text" class="form-control" id="nome" name="nome" value="{{dados.nome if dados else ''}}"
                                required minlength="2" placeholder="Ex: Maria Silva">
                     </div>
 
                     <div class="mb-3">
                         <label for="peso" class="form-label">Peso (kg)</label>
-                        <input type="number" class="form-control" id="peso" name="peso"
+                        <input type="number" class="form-control" id="peso" name="peso" value="{{dados.peso if dados else ''}}"
                                required step="0.1" min="1" max="500" placeholder="Ex: 70.5">
                         <div class="form-text">Informe o peso em quilogramas (kg)</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="altura" class="form-label">Altura (m)</label>
-                        <input type="number" class="form-control" id="altura" name="altura"
+                        <input type="number" class="form-control" id="altura" name="altura" value="{{dados.altura if dados else ''}}"
                                required step="0.01" min="0.5" max="3.0" placeholder="Ex: 1.75">
                         <div class="form-text">Informe a altura em metros (ex: 1,75)</div>
                     </div>
