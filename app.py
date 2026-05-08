@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from db import execute_query, execute_one
+from db import execute_query, execute_one, verificar_criar_tabela
 
 app = Flask(__name__)
 app.secret_key = 'imc_secret_key_2026'
+
+verificar_criar_tabela()
 
 def calcular_imc(peso, altura):
     return round (peso / (altura ** 2), 2)
@@ -23,21 +25,7 @@ def classificacao(imc):
 
 @app.route('/')
 def index():
-    sql = '''
-CREATE TABLE IF NOT EXISTS calculos(
-    id_calculo BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    peso DECIMAL(6,2) NOT NULL,
-    altura DECIMAL(5,2) NOT NULL,
 
-    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    alterado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deletado_em DATETIME NULL
-);
-'''
-    resultado = execute_query(sql, fetch=True)
-    print(resultado)
-    
     return render_template('index.html')
 
 
@@ -121,6 +109,31 @@ def editar_imc(id):
           return render_template('formulario.html', dados=dados)
      
     return render_template('formulario.html', dados=dados)
+
+@app.route('/deletar/fisico/<int:id>', methods=['POST'])
+def deletar_fisico(id):
+    try:
+       sql = "DELETE FROM calculos WHERE id_calculos= %s;"
+       execute_query(sql, (id,))
+       flash('Registro DELETADO PERMANENTEMENTE!', 'danger')
+    except Exception as e:
+       flash(f'Erro ao deletar fisicamente: {e}', 'warning')
+       app.logger.error(f'Erro no DELETE: {e}')
+
+    return redirect(url_for('resultados'))
+
+@app.route('/deletar/logico/<int:id>', methods=['POST'])
+def deletar_logico(id):
+    try:
+       sql = "UPDATE calculos SET deletado_em = NOW() WHERE id_calculos= %s;"
+       execute_query(sql, (id,))
+       flash('Registro ESCONDIDO!', 'danger')
+    except Exception as e:
+       flash(f'Erro ao deletar logicamente: {e}', 'warning')
+       app.logger.error(f'Erro no UPDATE: {e}')
+
+    return redirect(url_for('resultados'))      
+
 
 if __name__ == '__main__':
     app.run(debug=True)

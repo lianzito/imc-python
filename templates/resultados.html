@@ -54,6 +54,14 @@
                 </td>
                 <td>
                     <a href="{{ url_for('editar_imc', id=calc['id_calculo']) }}" class="'btn btn-sm btn-warning">Editar</a>
+
+                    <button data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-action="{{ url_for('deletar_fisico', id=calc['id_calculo']) }}" data-type="fisico" data-nome="{{ calc['nome'] }}"
+                     type="button" class="btn btn-sm btn-danger ms-1">Deletar</button>
+
+                    <button data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-action="{{ url_for('deletar_logico', id=calc['id_calculo']) }}" data-type="logico" data-nome="{{ calc['nome'] }}"
+                     type="button" class="btn btn-sm btn-outline-danger ms-1">Esconder</button>
                 </td>
             </tr>
             {% endfor %}
@@ -62,5 +70,48 @@
 </div>
 
 <a href="{{ url_for('index') }}" class="btn btn-outline-primary">← Voltar ao Início</a>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-light">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirmar exclusão</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="deleteForm" action="" method="post">
+        <div class="modal-body">
+            <p id="bodyText">DESEJA EXCLUIR ESSE REGISTRO?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Excluir</button>
+        </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+
+    const deleteModal = document.getElementById('deleteModal')
+
+        deleteModal.addEventListener('show.bs.modal', function(event){
+            const button = event.relatedTarget;
+
+            const actionURL = button.getAttribute('data-action');
+            const deletedType = button.getAttribute('data-type');
+            const nome = button.getAttribute('data-nome');
+
+            const form = deleteModal.querySelector('#deleteForm');
+            form.action = actionURL;
+
+            const bodyText = deleteModal.querySelector('#bodyText');
+            bodyText = `Tem certeza que deseja realizar o <b>Delete ${deletedType}</b> do <b>${nome}</b>`;
+         });
+    });
+
+</script>
 
 {% endblock %}
